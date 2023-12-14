@@ -1,6 +1,6 @@
 import os
 
-directory_path = r"C:\Nikil\Python\PROJECTS\P0 - Terminal Gamedev\SoR_v1\smooth_console"
+directory_path = r"C:\Nikil\Python\PROJECTS\P0 - Terminal Gamedev\SoR_v1\game"
 
 # List all files in the directory
 files = os.listdir(directory_path)

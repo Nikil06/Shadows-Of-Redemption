@@ -1,17 +1,17 @@
 import sys
+import time
 
 from .entity import Entity
 from .constants import *
 from .game_map import GameMap
 from .engine import Engine
+from .rendering import Camera
 
 from templaters.dungeon_explore import get_formatted_template, sample_player_data, sample_log_data
 import smooth_console as console
 
 def run_game():
-    import time
-
-    frame_rate = 1 / 60
+    per_frame_delay = 1 / FPS
 
     player = Entity(
         pos_x=int(MAP_WIDTH / 2), pos_y=int(MAP_HEIGHT / 2),
@@ -23,8 +23,10 @@ def run_game():
         graphic_data=ENEMY_GRAPHIC
     )
 
+    camera = Camera(CAMERA_WIDTH, CAMERA_HEIGHT, player)
+
     entities = [enemy, player]
-    game_map = GameMap(MAP_WIDTH, MAP_HEIGHT)
+    game_map = GameMap(MAP_WIDTH, MAP_HEIGHT, camera)
 
     engine = Engine(entities, game_map, player)
 
@@ -38,7 +40,7 @@ def run_game():
             console.print_to_console(screen)
             console.update_console(align_center=True)
 
-            time.sleep(frame_rate)
+            time.sleep(per_frame_delay)
     except KeyboardInterrupt:
         sys.stdout.flush()
         console.clear_screen()

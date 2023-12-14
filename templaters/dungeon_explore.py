@@ -120,10 +120,9 @@ def get_formatted_log_frame(logs):
 def get_formatted_template(location_name, dungeon_board, player_data, logs):
     substitution_map = {"world_0": f"──<< {location_name} >>".ljust(53, '─')}
 
-    board_lines = [" ".join(["", *row, ""]) for row in dungeon_board]
+    board_lines = [" ".join([*row]) for row in dungeon_board]
     for i, line in enumerate(board_lines):
         substitution_map[f"world_{i+1}"] = line
-
 
     player_frame = get_formatted_player_frame(player_data)
     logs_frame = get_formatted_log_frame(logs)

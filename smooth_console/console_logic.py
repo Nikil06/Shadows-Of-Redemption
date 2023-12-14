@@ -58,13 +58,12 @@ def __generate_grid():
         # Since 2D List is a mutable array of mutable array of string. (i.e. list[list[str]])
         return deepcopy(__grid_cache[size])
 
-    clear_console()
-    sys.stdout.flush()
-    clear_screen()
-
     # If there is no cached grid then create a new one and cache it, then return it.
     grid = [[" " for _ in range(size.columns)] for _ in range(size.lines)]
     __grid_cache[size] = grid
+
+    sys.stdout.flush()
+    clear_screen()
 
     # We return the deepcopy to prevent any references to be attached to the cache.
     # Since 2D List is a mutable array of mutable array of string. (i.e. list[list[str]])
@@ -194,6 +193,8 @@ def update_console(align_center: bool = False):
 
         elif ansi_bucket is None and char == "\033":
             ansi_bucket = char
+        elif char == '\033' and (ansi_bucket is not None and ansi_bucket[0] == "\033" and ansi_bucket[-1] == 'm'):
+            ansi_bucket += char
         elif ansi_bucket is not None and ansi_bucket[-1] != 'm':
             ansi_bucket += char
 

@@ -1,0 +1,102 @@
+
+def calculate_field_of_view(world, blocking_tiles, player_position, radius):
+    """
+    Calculate the field of view (FOV) for a player in a 2D world.
+
+    Args:
+        world (list[list[int]]): The 2D array representing the game world.
+        blocking_tiles (set): Set of values representing tiles that block visibility.
+        player_position (tuple): The (x, y) coordinates of the player in the world.
+        radius (int): The visibility radius from the player position.
+
+    Returns:
+        set: A set of (x, y) coordinates representing visible tiles.
+    """
+
+    visible_tiles = set()
+
+    def cast_light(cx, cy, row, start_slope, end_slope, radius, xx, xy, yx, yy):
+        """
+        Recursive Shadow Casting algorithm to cast light in an octant.
+
+        Args:
+            cx (int): X-coordinate of the center.
+            cy (int): Y-coordinate of the center.
+            row (int): Current row being processed.
+            start_slope (float): Start slope of the light cone.
+            end_slope (float): End slope of the light cone.
+            radius (int): Visibility radius.
+            xx, xy, yx, yy (int): Octant multipliers for coordinates.
+        """
+
+        if start_slope < end_slope:
+            return
+
+        radius_squared = radius * radius
+
+        for j in range(row, radius + 1):
+            dx, dy = -j - 1, -j
+            blocked = False
+
+            while dx <= 0:
+                dx += 1
+
+                X, Y = cx + dx * xx + dy * yx, cy + dx * xy + dy * yy
+
+                # Stop if out of bounds
+                if not (0 <= X < len(world[0]) and 0 <= Y < len(world)):
+                    break
+
+                # Calculate slopes
+                l_slope = (dx - 0.5) / (dy + 0.5)
+                r_slope = (dx + 0.5) / (dy - 0.5)
+
+                # Check visibility and update visible_tiles
+                if start_slope < r_slope:
+                    continue
+                elif end_slope > l_slope:
+                    break
+
+                if dx * dx + dy * dy < radius_squared:
+                    visible_tiles.add((X, Y))
+
+                # Handle blocked tiles
+                if blocked:
+                    if world[Y][X] in blocking_tiles:
+                        new_start_slope = r_slope
+                        continue
+                    else:
+                        blocked = False
+                        start_slope = new_start_slope
+
+                else:
+                    if world[Y][X] in blocking_tiles and j < radius:
+                        blocked = True
+                        cast_light(cx, cy, j + 1, start_slope, l_slope, radius, xx, xy, yx, yy)
+                        new_start_slope = r_slope
+
+    # Octant multipliers for RSC algorithm
+    octants = [
+        (1, 0, 0, -1), (0, 1, 1, 0), (0, 1, -1, 0), (1, 0, 0, 1),
+        (-1, 0, 0, 1), (0, -1, -1, 0), (0, -1, 1, 0), (-1, 0, 0, -1)
+    ]
+
+    for octant in range(8):
+        cast_light(player_position[0], player_position[1], 1, 1.0, 0.0, radius, *octants[octant])
+
+    return visible_tiles
+
+# Example usage:
+world_map = [
+    [0, 0, 0, 0, 0],
+    [0, 1, 1, 0, 0],
+    [0, 1, 1, 0, 0],
+    [0, 0, 0, 0, 0],
+]
+
+blocking_tiles_set = {1}  # Assuming value 1 represents a blocking tile
+player_pos = (2, 2)
+visibility_radius = 2
+
+visible_tiles_set = calculate_field_of_view(world_map, blocking_tiles_set, player_pos, visibility_radius)
+print("Visible Tiles:", visible_tiles_set)

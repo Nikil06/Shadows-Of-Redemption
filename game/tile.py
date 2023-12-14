@@ -1,17 +1,30 @@
+import random
 from dataclasses import dataclass
 import colors
 
 class GraphicData:
-    def __init__(self, base_char: str, base_color: str):
+    def __init__(self, base_char: str, base_color: str,
+                 rand_char_from: list[str] | None = None, rand_color_from: list[str] | None = None):
         self.base_color = base_color
         self.base_char = base_char
+        self.rand_char_from = rand_char_from
+        self.rand_color_from = rand_color_from
 
-        self.current_color = base_color
-        self.current_char = base_char
+        if rand_char_from is not None:
+            self.base_char = random.choice(rand_char_from)
 
-    def get_display_char(self):
-        return f"{self.current_color}{self.current_char}{colors.RESET}"
-        #return self.current_char
+        if rand_color_from is not None:
+            self.base_color = random.choice(rand_color_from)
+
+        self.current_color = self.base_color
+        self.current_char = self.base_char
+
+    def get_display_char(self, faint_effect=False):
+        faint = ""
+        if faint_effect:
+            faint = colors.FAINT
+
+        return f"{self.current_color}{faint}{self.current_char}{colors.RESET}"
 
     def revert_display_char(self):
         self.current_char = self.base_char
@@ -22,7 +35,12 @@ class GraphicData:
         self.current_color = new_color
 
     def get_copy(self):
-        return GraphicData(self.base_char, self.base_color)
+        return GraphicData(
+            self.base_char,
+            self.base_color,
+            rand_char_from=self.rand_char_from.copy() if self.rand_char_from else None,
+            rand_color_from=self.rand_color_from.copy() if self.rand_color_from else None
+        )
 
 @dataclass
 class TileData:

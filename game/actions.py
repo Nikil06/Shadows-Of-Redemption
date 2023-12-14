@@ -38,4 +38,7 @@ class MoveAction(Action):
         if not engine.game_map.is_tile_walkable(target_x, target_y):
             return None     # Target Location is not a walkable tile
 
+        if any(_entity.pos_x == target_x and _entity.pos_y == target_y for _entity in engine.entities):
+            return None     # Target Location is occupied by another entity
+
         entity.move_by(self.dx, self.dy)

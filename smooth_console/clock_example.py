@@ -12,7 +12,7 @@ Test Clock : Updates the clock smoothly
 {colors.LIGHT_GREEN}+==========+
 | {colors.CYAN}{'{}'}{colors.LIGHT_GREEN} |
 +----------+{colors.RESET}
-'{colors.NEGATIVE}{colors.LIGHT_GREEN}Light Green Line Testing coloured output{colors.RESET}'"""
+'{colors.NEGATIVE}{colors.LIGHT_GREEN}Light Green Line Testing coloured output{colors.RESET}'""".strip('\n')
     try:
         while True:
             clear_console()

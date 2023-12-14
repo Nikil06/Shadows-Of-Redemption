@@ -1,5 +1,8 @@
 from .game_map import GameMap
 from .entity import Entity
+from .rendering import compute_fov
+
+from .constants import FOV_RADIUS
 
 from .input_handler import handle_input
 
@@ -13,22 +16,27 @@ class Engine:
         action = handle_input()
 
         if action is None:
-            return None
+            return False
 
         action.perform(self, self.player)
+        return True
 
         # TODO: Update Field of View
 
     def get_render(self):
+        self.update_fov()
         render = self.game_map.get_map_render()
 
         for entity in self.entities:
-            if self.game_map.is_tile_visible(entity.pos_x, entity.pos_y):
-                render[entity.pos_y][entity.pos_x] = entity.graphic_data.get_display_char()
 
-        # render the render
-        #return '\n'.join(' '.join(row) for row in render)
+            if self.game_map.camera.is_xy_in_camera_bounds(entity.pos_x, entity.pos_y) \
+                    and self.game_map.is_tile_visible(entity.pos_x, entity.pos_y):
+
+                x_rel, y_rel = self.game_map.camera.adjust_xy_to_camera(entity.pos_x, entity.pos_y)
+                render[y_rel][x_rel] = entity.graphic_data.get_display_char()
+
         return render
 
     def update_fov(self):
-        pass
+        compute_fov(self.game_map, self.player, FOV_RADIUS)
+

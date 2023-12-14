@@ -15,3 +15,4 @@ from game.run_game import run_game
 from smooth_console.clock_example import run_clock
 
 run_game()
+
